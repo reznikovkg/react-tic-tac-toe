@@ -10,7 +10,8 @@ class TitTacToe extends Component {
             sizeFiled: 3,
             matrix: [],
             playerStep: 1,
-            isStart: false
+            isStart: false,
+            auto: false
         };
 
         this.clickPlayer = this.clickPlayer.bind(this);
@@ -39,6 +40,12 @@ class TitTacToe extends Component {
     handleChangeSizeField = (e) => {
         if (!this.state.isStart) {
             this.setState({sizeFiled: e.target.value});
+        }
+    };
+
+    handleChangeAuto = (e) => {
+        if (!this.state.isStart) {
+            this.setState({auto: e.target.checked});
         }
     };
 
@@ -103,9 +110,23 @@ class TitTacToe extends Component {
             mat[i][j] = this.state.playerSide;
 
             if (this.state.playerSide === 'x') {
-                this.setState({playerSide: 'o', playerStep: (this.state.playerStep === 1 ? 2 : 1) });
+                this.setState({playerSide: 'o', playerStep: (this.state.playerStep === 1 ? 2 : 1) },
+                    ()=>{
+
+
+                        console.log(this.state.auto,this.state.playerStep);
+                        if (this.state.auto && (this.state.playerStep === 2)) {
+                            this.autoStep();
+                        }
+                    });
             } else {
-                this.setState({playerSide: 'x', playerStep: (this.state.playerStep === 1 ? 2 : 1) });
+                this.setState({playerSide: 'x', playerStep: (this.state.playerStep === 1 ? 2 : 1) },
+                    ()=>{
+                        console.log(this.state.auto,this.state.playerStep);
+                        if (this.state.auto && (this.state.playerStep === 2)) {
+                            this.autoStep();
+                        }
+                    });
             }
         }
 
@@ -201,8 +222,10 @@ class TitTacToe extends Component {
                             onChange={this.handleChangeSizeField}>
                         {[3, 4, 5, 6, 7].map(i => <option key={i} value={i}>{i}</option>)}
                     </select>
+                    <input type="checkbox" id="autoPlay" name="autoPlay" onChange={this.handleChangeAuto}/>
+                    <label htmlFor="autoPlay">2 игрок БОТ</label>
                     <button onClick={this.start}>Начать игру за {this.state.playerSide} в {this.state.sizeFiled}x{this.state.sizeFiled}</button>
-                    <button onClick={this.resetting}>Сбросить</button>
+                    <button onClick={this.resetting}>Закончить игру</button>
                 </nav>
                 <div className='table'>
                     {this.state.matrix.map((i,indexI) =>
