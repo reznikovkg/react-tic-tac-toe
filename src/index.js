@@ -13,23 +13,20 @@ function createElement(node) {
     return $el;
 }
 
-function updateElement(rootElement, newElement, oldElement) {
-    console.log(rootElement, newElement, oldElement);
-
+function updateElement(rootElement, newElement, oldElement, index = 0) {
     if (newElement === undefined) {
-        rootElement.removeChild();
+        rootElement.removeChild(rootElement.children[index]);
         return;
     }
 
     if (oldElement === undefined) {
-        rootElement.appendChild(newElement);
+        rootElement.appendChild(createElement(newElement));
         return;
     }
 
     if (!newElement.children && !oldElement.children) {
         if (newElement !== oldElement) {
-            oldElement = newElement;
-            rootElement.innerText = oldElement;
+            rootElement.innerText = newElement;
         }
 
         return;
@@ -37,29 +34,9 @@ function updateElement(rootElement, newElement, oldElement) {
 
     let len = oldElement.children.length > newElement.children.length ? oldElement.children.length : newElement.children.length;
 
-
     for (let i = 0; i < len; i++) {
-        if (rootElement) {
-            updateElement(rootElement.children[i], newElement.children[i], oldElement.children[i]);
-        } else {
-            updateElement(rootElement, newElement.children[i], oldElement.children[i]);
-        }
+        updateElement(rootElement.children[index], newElement.children[i], oldElement.children[i], i);
     }
-
-    // if (oldElement.children !== newElement.children) {
-    //     let len = oldElement.children.length > newElement.children.length ? oldElement.children.length : newElement.children.length;
-    //
-    //     newElement.children.forEach(function (item, i, newElement) {
-    //         console.log(oldElement.children.indexOf( item ));
-    //         if (oldElement.children.indexOf( item ) !== -1) {
-    //             rootElement.appendChild(item);
-    //         }
-    //     });
-    //
-    //
-    //
-    // }
-    return;
 }
 
 const initDOM = (
@@ -108,7 +85,7 @@ const initNodeButton = document.createElement("button");
 initNodeButton.innerText = "Init";
 buttons.appendChild(initNodeButton);
 initNodeButton.addEventListener("click", () => {
-    updateElement(rootElement, initDOM, initDOM);
+    updateElement(rootElement, initDOM, changeNode);
 });
 
 const addNodeButton = document.createElement("button");
