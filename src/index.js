@@ -1,110 +1,84 @@
-/** @jsx h */
+const createStore = (reducer, initialState) => {
+    let state = initialState;
 
-function h(type, props, ...children) {
-    return { type, props, children };
-}
+    let listeners = [];
 
-function createElement(node) {
-    if (typeof node === "string") {
-        return document.createTextNode(node);
-    }
-    const $el = document.createElement(node.type);
-    node.children.map(createElement).forEach($el.appendChild.bind($el));
-    return $el;
-}
+    const getState = () => state;
 
-function updateElement(rootElement, newElement, oldElement, index = 0) {
-    if (newElement === undefined) {
-        rootElement.removeChild(rootElement.children[index]);
-        return;
-    }
+    const dispatch = (action) => {
+        state = reducer(state, action);
 
-    if (oldElement === undefined) {
-        rootElement.appendChild(createElement(newElement));
-        return;
-    }
+        listeners.forEach((listener) => {
+            listener();
+        });
+    };
 
-    if (!newElement.children && !oldElement.children) {
-        if (newElement !== oldElement) {
-            rootElement.innerText = newElement;
+    const subscribe = (listener) => {
+        listeners.push(listener);
+
+        return () => {
+            const index = listeners.indexOf(listener);
+            delete listeners[index];
         }
+    };
 
-        return;
+    return {
+        getState,
+        dispatch,
+        subscribe
+    };
+};
+
+// reducer
+const reducer = (state, action) => {
+    switch (action.type) {
+        case "INCREMENT":
+            return state + 1;
+        case "DECREMENT":
+            return state - 1;
+        default:
+            return state;
     }
+};
+// reducer
 
-    let len = oldElement.children.length > newElement.children.length ? oldElement.children.length : newElement.children.length;
+const store = createStore(reducer, 0);
 
-    for (let i = 0; i < len; i++) {
-        updateElement(rootElement.children[index], newElement.children[i], oldElement.children[i], i);
-    }
-}
+window.increment = () => {
+    store.dispatch({ type: "INCREMENT" });
+};
 
-const initDOM = (
-    <div>
-        <p>Hello!</p>
-        <ul>
-            <li>How is it going?</li>
-        </ul>
-    </div>
-);
+window.decrement = () => {
+    store.dispatch({ type: "DECREMENT" });
+};
 
-const addNode = (
-    <div>
-        <p>Hello!</p>
-        <ul>
-            <li>How is it going?</li>
-        </ul>
-        <p>Good</p>
-    </div>
-);
+// first component
+const buttonIncrement =
+    "<div><button onclick='increment()'>INCREMENT</button></div>";
+const buttonDecrement =
+    "<div><button onclick='decrement()'>DECREMENT</button></div>";
+const buttonUnsubscribe =
+    "<div><button onclick='unsubscribe()'>UNSUBSCRIBE</button></div>";
 
-const removeNode = (
-    <div>
-        <p>Hello!</p>
-        <ul>
-            <li>How is it going?</li>
-        </ul>
-    </div>
-);
+const result = "<div id='result'></div>";
 
-const changeNode = (
-    <div>
-        <p>Hi!</p>
-        <ul>
-            <li>How is it going?</li>
-        </ul>
-    </div>
-);
+const render = () => {
+    document.getElementById("root").innerHTML =
+        result + buttonIncrement + buttonDecrement + buttonUnsubscribe;
+    document.getElementById("result").innerHTML = store.getState();
+};
 
-const rootElement = document.getElementById("root");
-rootElement.appendChild(createElement(initDOM));
+// second component
+const result2 = "<div id='result2'></div>";
+const buttonUnsubscribe2 =
+    "<div><button onclick='unsubscribe2()'>UNSUBSCRIBE</button></div>";
+const render2 = () => {
+    document.getElementById("root2").innerHTML =
+        "<br/>" + result2 + buttonUnsubscribe2;
+    document.getElementById("result2").innerHTML = store.getState();
+};
 
-const buttons = document.getElementById("buttons");
-
-const initNodeButton = document.createElement("button");
-initNodeButton.innerText = "Init";
-buttons.appendChild(initNodeButton);
-initNodeButton.addEventListener("click", () => {
-    updateElement(rootElement, initDOM, changeNode);
-});
-
-const addNodeButton = document.createElement("button");
-addNodeButton.innerText = "Add";
-buttons.appendChild(addNodeButton);
-addNodeButton.addEventListener("click", () => {
-    updateElement(rootElement, addNode, initDOM);
-});
-
-const removeNodeButton = document.createElement("button");
-removeNodeButton.innerText = "Remove";
-buttons.appendChild(removeNodeButton);
-removeNodeButton.addEventListener("click", () => {
-    updateElement(rootElement, removeNode, addNode);
-});
-
-const changeNodeButton = document.createElement("button");
-changeNodeButton.innerText = "Change";
-buttons.appendChild(changeNodeButton);
-changeNodeButton.addEventListener("click", () => {
-    updateElement(rootElement, changeNode, removeNode);
-});
+window.unsubscribe = store.subscribe(render);
+window.unsubscribe2 = store.subscribe(render2);
+render();
+render2();
