@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import  { Provider, connect } from 'react-redux';
 
 
@@ -37,17 +37,18 @@ const reducer = (state, action) => {
     }
 };
 
-const store = createStore(reducer, initialState, window.__REDUX_DEVTOOLS_EXTENSION__());
 
-const next = store.dispatch;
 
-store.dispatch = (action) => {
+const logger = store => next => action => {
     console.log('store before: ', store.getState());
     console.log('action: ', action);
-    next(action);
+    let result = next(action);
     console.log('store after: ', store.getState());
     console.log('\n');
+    return result;
 };
+
+const store = createStore(reducer, initialState, applyMiddleware(logger));
 
 const mapDispatchToProps = (dispatch) => ({
     onIncrement: (payload) => dispatch(incrementAction(payload)),
