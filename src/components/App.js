@@ -10,6 +10,20 @@ const initialState = {
     wallet: 10
 };
 
+const incrementAction = (payload) => {
+    return {
+        type: INCREMENT,
+        payload
+    }
+};
+
+const decrementAction = (payload) => {
+    return {
+        type: DECREMENT,
+        payload
+    }
+};
+
 const reducer = (state, action) => {
     switch (action.type) {
         case INCREMENT:
@@ -25,9 +39,17 @@ const reducer = (state, action) => {
 
 const store = createStore(reducer, initialState, window.__REDUX_DEVTOOLS_EXTENSION__());
 
-const mapDispatchToProps = dispatch => ({
-    onIncrement: (payload) => dispatch({ type: INCREMENT, payload }),
-    onDecrement: (payload) => dispatch({ type: DECREMENT, payload })
+const dispatchLogger = (store, action) => {
+    console.log('store before: ', store.getState());
+    console.log('action: ', action);
+    store.dispatch(action);
+    console.log('store after: ', store.getState());
+    console.log('\n');
+};
+
+const mapDispatchToProps = () => ({
+    onIncrement: (payload) => dispatchLogger(store, incrementAction(payload)),
+    onDecrement: (payload) => dispatchLogger(store, decrementAction(payload))
 });
 
 const mapStateToProps = state => ({
