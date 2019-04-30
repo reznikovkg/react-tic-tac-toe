@@ -39,17 +39,19 @@ const reducer = (state, action) => {
 
 const store = createStore(reducer, initialState, window.__REDUX_DEVTOOLS_EXTENSION__());
 
-const dispatchLogger = (store, action) => {
+const next = store.dispatch;
+
+store.dispatch = (action) => {
     console.log('store before: ', store.getState());
     console.log('action: ', action);
-    store.dispatch(action);
+    next(action);
     console.log('store after: ', store.getState());
     console.log('\n');
 };
 
-const mapDispatchToProps = () => ({
-    onIncrement: (payload) => dispatchLogger(store, incrementAction(payload)),
-    onDecrement: (payload) => dispatchLogger(store, decrementAction(payload))
+const mapDispatchToProps = (dispatch) => ({
+    onIncrement: (payload) => dispatch(incrementAction(payload)),
+    onDecrement: (payload) => dispatch(decrementAction(payload))
 });
 
 const mapStateToProps = state => ({
