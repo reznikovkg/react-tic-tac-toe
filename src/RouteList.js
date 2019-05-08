@@ -1,7 +1,6 @@
 import Homepage from './components/pages/Homepage';
 import Main from './components/pages/Main';
 import Profile from './components/pages/Profile';
-import User from './components/pages/User';
 
 const RouteList = {
     'homepage': {
@@ -21,16 +20,6 @@ const RouteList = {
         component: Profile,
         title: 'Профиль',
         toNav: true
-    },
-    'user': {
-        path: '/user/:id',
-        pathWithParams: (id) => {
-            return `/user/${id}`
-        },
-        component: User,
-        titleWithParams: (id) => {
-            return `Пользователь ${id}`
-        },
     },
 };
 
