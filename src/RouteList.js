@@ -1,37 +1,45 @@
 import Homepage from './components/pages/Homepage';
-import Main from './components/pages/Main';
-import Profile from './components/pages/Profile';
-import User from './components/pages/User';
+import Login from './components/pages/Login';
+
+import Todos from './components/pages/Todos';
+import Users from './components/pages/Users';
+import Logout from "./components/pages/Logout";
 
 const RouteList = {
+    'login': {
+        path: '/login',
+        component: Login,
+        title: 'Login',
+        role: 'nouser'
+    },
+    'logout': {
+        path: '/logout',
+        component: Logout,
+        auth: true,
+        title: 'Logout',
+        role: 'user'
+    },
     'homepage': {
         path: '/',
         component: Homepage,
-        title: 'Домашняя',
-        toNav: true
+        auth: true,
+        title: 'Homepage',
+        role: 'user'
     },
-    'main': {
-        path: '/main',
-        component: Main,
-        title: 'Главная',
-        toNav: true
+    'todos': {
+        path: '/todos',
+        component: Todos,
+        auth: true,
+        title: 'Todos',
+        role: 'user'
     },
-    'profile': {
-        path: '/profile',
-        component: Profile,
-        title: 'Профиль',
-        toNav: true
-    },
-    'user': {
-        path: '/user/:id',
-        pathWithParams: (id) => {
-            return `/user/${id}`
-        },
-        component: User,
-        titleWithParams: (id) => {
-            return `Пользователь ${id}`
-        },
-    },
+    'users': {
+        path: '/users',
+        component: Users,
+        auth: true,
+        title: 'Users',
+        role: 'admin'
+    }
 };
 
 export default RouteList;
