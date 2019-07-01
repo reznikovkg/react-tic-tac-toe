@@ -1,38 +1,20 @@
 import React, { Component } from 'react';
-
 import { withRouter } from 'react-router-dom';
-
 import  { connect } from 'react-redux';
 
-import LoginForm from './../forms/LoginForm'
-
-import ApiList from '../../ApiList';
-import ApiRequest from './../../ApiRequest';
-import { getUser } from '../../store/getters/userGetters';
-import { getApiReducer } from '../../store/getters/ApiGetters';
-import { getRouter } from "../../store/getters/routerGetters";
-import { push as pushRouter } from 'connected-react-router';
-import RouteList from '../../RouteList';
-import Cookies from 'js-cookie';
-
-import { history } from './../../store/store';
+import LoginForm from 'components/forms/LoginForm'
+import { fetchLogin } from 'store/actions/userActions';
+import { getApiReducer } from 'store/selectors/Api';
+import RouteList from 'RouteList';
+import { history } from 'store/store';
 
 const mapStateToProps = state => ({
-    user: getUser(state),
-    ApiReducer: getApiReducer(state),
-    router: getRouter(state)
+    ApiReducer: getApiReducer(state)
 });
 
 const mapDispatchToProps = dispatch => ({
-    setUser: (payload) => dispatch({ type:'SET_USER', payload }),
-    setApiMessage: (payload) => dispatch({ type:'SET_API_MESSAGE', payload }),
-    removeApiMessage: (payload) => dispatch({ type:'REMOVE_API_MESSAGE', payload }),
-    sendRequest: (payload) => dispatch({ type:'SENT_REQUEST', payload }),
-    receivedResponse: (payload) => dispatch({ type:'RECEIVED_RESPONSE', payload }),
-    pushRouter
+    fetchLogin: (payload) => dispatch(fetchLogin(payload)),
 });
-
-
 
 class Login extends Component{
     constructor(props) {
@@ -41,22 +23,9 @@ class Login extends Component{
     }
 
     submit = values => {
-        this.props.sendRequest();
-
-        ApiRequest('POST', ApiList.login, {
-            login: values.username,
-            password: values.password
-        }).then((response) => {
-            Cookies.set('user_name', response.data.name, 30);
-            this.props.removeApiMessage();
-            this.props.receivedResponse();
-            this.props.setUser(response.data);
-            history.push(RouteList.homepage.path);
-
-        }).catch((errorMessage)=> {
-            this.props.receivedResponse();
-            this.props.setApiMessage(errorMessage);
-        })
+        this.props.fetchLogin(values).then((response)=>{
+            history.push(RouteList.homepage.path)
+        });
     };
 
     render() {

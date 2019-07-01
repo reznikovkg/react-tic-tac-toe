@@ -1,22 +1,29 @@
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
-const ApiRequest = (type, url, params = null) => {
+const ApiRequest = (type, url, params = null, errorView = false) => {
 
-    function errorHand(error) {
+    function errorHand(error, errorViewHand = false) {
+        console.log(errorViewHand)
         console.log('error.response = ', error.response ? error.response : undefined);
 
-
         if (error.response.data.message) {
-            alert(error.response.data.message);
+            if (!errorViewHand) {
+                alert(error.response.data.message);
+            }
             return error.response.data.message;
         } else {
             if (error.response.statusText) {
-                alert(error.response.statusText);
+
+                if (!errorViewHand) {
+                    alert(error.response.statusText);
+                }
                 return error.response.statusText;
             }
 
-            alert('ERROR! Please, reload app');
+            if (!errorViewHand) {
+                alert('ERROR! Please, reload app');
+            }
             return error.toString();
         }
     }
@@ -31,7 +38,7 @@ const ApiRequest = (type, url, params = null) => {
                 ).then((response) => {
                     resolve(response);
                 }).catch((error) => {
-                    reject(errorHand(error));
+                    reject(errorHand(error, errorView));
                 });
                 break;
             case 'POST':
@@ -41,7 +48,7 @@ const ApiRequest = (type, url, params = null) => {
                 ).then((response) => {
                     resolve(response);
                 }).catch((error) => {
-                    reject(errorHand(error));
+                    reject(errorHand(error, errorView));
                 });
                 break;
 

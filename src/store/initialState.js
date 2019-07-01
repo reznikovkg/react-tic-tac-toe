@@ -1,18 +1,19 @@
-// let user = { t: 1};
-let user = null;
-
 export default {
     userReducer: {
-        user: user
+        user: null
     },
     ApiReducer: {
         waitResponse: false,
-        message: null
+        message: null,
+        toRoute: '/'
     },
     todosReducer: {
-        todos: []
+        todos: [],
+        load: false,
+        id: null
     },
     usersReducer: {
-        users: []
+        users: [],
+        load: false
     }
 };

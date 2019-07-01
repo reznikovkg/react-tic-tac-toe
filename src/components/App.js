@@ -3,29 +3,31 @@ import { Route, Redirect, Link, Switch } from 'react-router-dom';
 
 import { withRouter } from 'react-router-dom';
 
-import RouteList from './../RouteList';
+import RouteList from 'RouteList';
 
 import  { connect } from 'react-redux';
 
-import { getUser } from './../store/getters/userGetters';
-import { getRouter } from './../store/getters/routerGetters';
+import { getUser } from 'store/selectors/user';
+import { getRouter } from 'store/selectors/router';
+import { getRouteTo } from 'store/selectors/Api';
 
 
 import { Menu } from 'semantic-ui-react';
-import Cookies from "js-cookie";
-import ApiRequest from "../ApiRequest";
-import ApiList from "../ApiList";
-import {history} from "../store/store";
+
+import { fetchMe } from 'store/actions/userActions';
+import { setRoute } from 'store/actions/ApiActions';
+
+import {history} from "store/store";
 
 const mapStateToProps = state => ({
     user: getUser(state),
-    router: getRouter(state)
+    router: getRouter(state),
+    routeTo: getRouteTo(state)
 });
 
 const mapDispatchToProps = dispatch => ({
-    setUser: (payload) => dispatch({ type:'SET_USER', payload }),
-    sendRequest: (payload) => dispatch({ type:'SENT_REQUEST', payload }),
-    receivedResponse: (payload) => dispatch({ type:'RECEIVED_RESPONSE', payload }),
+    setRoute: (payload) => dispatch(setRoute(payload)),
+    fetchMe: (payload) => dispatch(fetchMe())
 });
 
 class App extends Component {
@@ -35,27 +37,9 @@ class App extends Component {
     }
 
     checkUser = () => {
-
-        let username = Cookies.get('user_name');
-
-        if (username) {
-            this.props.sendRequest();
-
-            ApiRequest('GET', ApiList.me).then((response) => {
-                Cookies.set('user_name', response.data.name, 30);
-                this.props.receivedResponse();
-                this.props.setUser(response.data);
-                history.push(RouteList.homepage.path);
-                console.log('ok')
-
-            }).catch((errorMessage)=> {
-                if (errorMessage !== 'Internal Server Error') {
-                    Cookies.remove('user_name');
-                }
-                this.props.receivedResponse();
-                console.log(errorMessage);
-            })
-        }
+        this.props.fetchMe().then((response)=>{
+            history.push(this.props.routeTo);
+        });
     };
 
     routeDefault = ( route ) =>
@@ -67,6 +51,7 @@ class App extends Component {
                 return <route.component/>
             } else {
                 if (route.auth) {
+                    this.props.setRoute(this.props.router.location.pathname);
                     return <Redirect to={RouteList.login.path}/>
                 }
                 return <route.component/>

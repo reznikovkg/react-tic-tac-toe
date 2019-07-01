@@ -1,7 +1,7 @@
 import React from 'react';
 import {Field , reduxForm} from 'redux-form';
 
-import MyCustomInput from './../el/MyCustomInput';
+import MyCustomInput from 'components/el/MyCustomInput';
 
 import { Form, Grid, Segment, Header, Button } from 'semantic-ui-react';
 
